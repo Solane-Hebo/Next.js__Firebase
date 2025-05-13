@@ -37,7 +37,7 @@ export const AuthForm = () => {
     })
 
   return (
-    <div className="border max-w-2xl rounded-2xl mx-auto not-dark:bg-gray-100 p-5">
+    <div className="border max-w-2xl rounded-2xl mx-autop-5">
         {
             showLogin
             ? <LoginForm changeForm={changeForm} form={loginForm} />

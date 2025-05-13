@@ -1,8 +1,6 @@
    "use client"
 
 import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
@@ -16,6 +14,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { useAuth } from "@/context/authContext"
+import { getErrorMessage } from "@/lib/getFirebaseError"
 
    export const registerFormSchema = z.object({
     userName: z.string()
@@ -37,8 +37,20 @@ import { Input } from "@/components/ui/input"
 export const RegisterForm = ({changeForm, form }) => {
 
     const [errorMessage, setErrorMessage] = useState(null)
+    const { register, loading } = useAuth()
 
-    function onSubmit (values) {
+
+    async function onSubmit (values) {
+
+      try {
+        const {userName, email, password} = values
+        await register(userName, email, password, )
+        
+      } catch (error) {
+        const errorMessage = getErrorMessage(error.code)
+        setErrorMessage(errorMessage)
+        
+      }
         console.log(values)
     }
   return (
@@ -96,7 +108,7 @@ export const RegisterForm = ({changeForm, form }) => {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Bekräfta lösenord.</FormLabel>
+              <FormLabel>Bekräfta lösenord</FormLabel>
               <FormControl>
                 <Input className="not-dark:bg-white" type="password" {...field} />
               </FormControl>
@@ -105,7 +117,7 @@ export const RegisterForm = ({changeForm, form }) => {
           )}
         />
         <p>Har du redan ett konto? <span onClick={() => changeForm ("login")} className="underline cursor-pointer">Logga in</span></p>
-        <Button type="submit">Register</Button>
+        <Button  disabled={loading} className="w-full sm:w-auto" type="submit">Register</Button>
       </form>
     </Form>
     </>

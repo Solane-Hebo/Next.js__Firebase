@@ -32,7 +32,7 @@ export default function RootLayout({ children }) {
           
           <Navbar />
           <main className=" wrapper ">
-          <div className="my-4  bg-gray-200 rounded-2xl p-4 sm:p-8 min-h-[calc(100vh-2rem)]">
+          <div className="my-4  not-dark:bg-gray-200 dark:bg-gray-900 rounded-2xl p-4 sm:p-8 min-h-[calc(100vh-2rem)]">
           {children}
           </div>
 

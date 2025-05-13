@@ -1,5 +1,5 @@
 import { initializeApp, getApp, getApps} from "firebase/app";
-import { CACHE_SIZE_UNLIMITED, getFiresStore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore"
+import { CACHE_SIZE_UNLIMITED, getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 import { getStorage} from "firebase/storage"
 const firebaseConfig = {
@@ -13,7 +13,7 @@ const firebaseConfig = {
 
   const app = getApps().length ? getApp() : initializeApp(firebaseConfig)
 
-  // const db = getFiresStore(app)
+  // const db = getFirestore(app)
 
   let db
   try {
@@ -26,7 +26,7 @@ const firebaseConfig = {
 
   } catch (error) {
     console.warn("indexedDB cache avaktiverad:", error.code)
-    db = getFiresStore(app)
+    db = getFirestore(app)
   }
 
   const auth = getAuth(app)

@@ -1,8 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
@@ -16,6 +14,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { useAuth } from "@/context/authContext"
+import { getErrorMessage } from "@/lib/getFirebaseError"
 
    export const loginFormSchema = z.object({
     email: z.string()
@@ -28,9 +28,17 @@ import { Input } from "@/components/ui/input"
 export const LoginForm = ({changeForm, form}) => {
 
     const [errorMessage, setErrorMessage] = useState(null)
+    const {loading, login } = useAuth()
 
 
-    function onSubmit (values) {
+   async function onSubmit (values) {
+      try {
+        await login(values.email, values.password)
+      } catch (error) {
+        const errorMessage = getErrorMessage(error.code)
+        setErrorMessage(errorMessage)
+        
+      }
         console.log(values)
     }
   return (
@@ -70,7 +78,7 @@ export const LoginForm = ({changeForm, form}) => {
         />
        
         <p>Har du inte ett konto? <span onClick={() => changeForm ("register")} className="underline cursor-pointer">Registrera här</span></p>
-        <Button type="submit">Logga in</Button>
+        <Button disabled={loading} className="W-full sm:w-auto" type="submit">Logga in</Button>
       </form>
     </Form>
     </>

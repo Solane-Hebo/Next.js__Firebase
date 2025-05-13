@@ -18,7 +18,7 @@ export function ModeToggle() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" >
-            <p className="text-lg capitalize">
+            <p className="text- capitalize">
                 {
                     theme === "system"? "system":
                     theme === "dark"? "Mörkt": "ljust"
