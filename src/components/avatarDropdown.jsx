@@ -11,11 +11,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useAuth } from "@/context/authContext"
 import Link from "next/link"
 import { LogOutIcon, Settings} from "lucide-react"
+import { getReadableTextColor } from "@/utils/color"
 
 
 export const AvatarDropdown = () => {
 
     const{user, logout, isAdmin} = useAuth()
+    const bgColor = user.color ?? "#ffffff"
+    const textColor =  getReadableTextColor(bgColor)
+    
 
   return (
 <DropdownMenu>
@@ -23,8 +27,11 @@ export const AvatarDropdown = () => {
    <DropdownMenuTrigger>
     <Avatar className="size-9 cursor-pointer">
    <AvatarImage src={user?.photoURL || ""} />
-    <AvatarFallback>{user?.userName?.slice(0,2) || "JD"}</AvatarFallback>
-   </Avatar>
+    <AvatarFallback className="font-samibold" style={{
+    backgroundColor: bgColor,
+    color: textColor,}} >
+      {user?.userName?.slice(0,2) || "JD"}</AvatarFallback>
+   </Avatar >
   </DropdownMenuTrigger>
 
   <DropdownMenuContent align="end" className="w-48">
@@ -48,8 +55,8 @@ export const AvatarDropdown = () => {
       )
     }
 
-    <DropdownMenuItem asChild className="cursor-pointer not-dark:hover:bg-gray-200">
-      <Link href ="/settings" className="flex items-ccenter gap-2 text-2xl md:text-base">
+    <DropdownMenuItem asChild className="cursor-pointer ">
+      <Link href ="/settings" className="flex not-dark:hover:bg-gray-200 gap-2 text-2xl md:text-base">
       <Settings className="size-5 md:size-4"/> Inställningar
       </Link>
     </DropdownMenuItem>

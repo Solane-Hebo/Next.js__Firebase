@@ -1,7 +1,7 @@
 "use client"
 
 import { auth, db } from "@/lib/firebase"
-import { createUserWithEmailAndPassword, EmailAuthProvider, onAuthStateChanged, reauthenticateWithCredential, signInWithEmailAndPassword, signOut, updatePassword, updateProfile } from "firebase/auth"
+import { createUserWithEmailAndPassword, EmailAuthProvider, onAuthStateChanged, reauthenticateWithCredential, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword, signOut, updatePassword, updateProfile } from "firebase/auth"
 import { doc, getDoc, setDoc, Timestamp, updateDoc } from "firebase/firestore"
 import { useRouter } from "next/navigation"
 import toast from "react-hot-toast"
@@ -18,8 +18,6 @@ export const AuthProvider = ({ children }) => {
     const router = useRouter()
 
 
-    console.log(user)
-
     useEffect (() => {
        const unsub = onAuthStateChanged(auth, async(firebaseUser) => {
             if(!firebaseUser) {
@@ -29,6 +27,14 @@ export const AuthProvider = ({ children }) => {
             }
             
         const docRef = doc(db, "users", firebaseUser.uid)
+
+        if(firebaseUser?.emailVerified) {
+            await updateDoc(docRef, {
+                verified: firebaseUser.emailVerified
+            }
+            )
+        }
+      
 
         const getUserDocWithRetry = async(retries= 5, delay = 300) => {
             let docSnap = null
@@ -53,12 +59,16 @@ export const AuthProvider = ({ children }) => {
 
         return () => unsub()
     }, [])
+
+
     const register = async (userName, email, password) =>{
         setLoading(true)
 
        try {
         const res = await createUserWithEmailAndPassword(auth, email, password)
-        await updateProfile(res.user, {displayName: userName})
+        console.log("Creating user doc with UID:", res.user.uid)
+
+        await updateProfile(res.user, {userName: userName})
         if(!res.user){
             console.log("no user")
             return
@@ -74,6 +84,8 @@ export const AuthProvider = ({ children }) => {
             verified: false,
             color: "#9dee"
         })
+
+        await verifyEmail()
         
        } catch (error) {
         console.log("Error registering the user")
@@ -108,20 +120,44 @@ export const AuthProvider = ({ children }) => {
         return user.role === "admin"
     }
   
-const updateUser = async (user, newUserData) =>{
+const updateUser = async (user, newUserData) => {
     setLoading(true)
     const toastId = toast.loading('Laddar...')
     try {
 
         const userRef = doc(db, "users", user.uid)
         await updateDoc(userRef, newUserData)
+        if (user.uid === auth.currentUser?.uid) {
         setUser((prevUser) => ({...prevUser, ...newUserData }))
+        }
         toast.success ("Profilen uppdaterad", {id:toastId})
     } catch (error) {
         toast.error("Någonting gick fel, försök igen", { id: toastId })
         console.error("Error updating the user:", error)
     } finally {
         setLoading(false)
+    }
+}
+
+const verifyEmail = async () => {
+    const toastId = toast.loading('Skickar länk...')
+    const user = auth.currentUser
+    if(!user){
+        console.error("No user currently signed in.")
+        toast.error("Någonting gick fel, försök igen.", {id: toastId})
+        return
+    }
+    try { 
+        await sendEmailVerification(user, {url: `${window.location.origin}/`,
+            handleCodeInApp: false
+        })
+        toast.success("Verifieringslänk skickad, kolla din epost", {id: toastId})
+        
+    } catch (error) {
+        console.error("Error sending email verification:", error)
+        toast.error("Någonting gick fel, försök igen.", {id: toastId})
+
+        
     }
 }
 
@@ -160,6 +196,23 @@ const changePassword = async(oldPassword, newPassword) =>{
 
 }
 
+const sendPasswordReset = async (email) => {
+    setLoading(true)
+    const toastId = toast.loading("Laddar...")
+    try {
+        await sendPasswordResetEmail(auth, email)
+        toast.success("Återstälningslänk skickad", {id: toastId })
+        return "Återstälningslänk skickad"
+        
+    } catch (error) {
+        console.error("Error sending password reset email:", error)
+        toast.error("Någonting gick fel, försök igen", {id: toastId})
+        return "Någonting gick fel, försök igen"  
+    } finally {
+        setLoading(false)
+    }
+}
+
     const value = {
         user,
         loading,
@@ -169,7 +222,9 @@ const changePassword = async(oldPassword, newPassword) =>{
         login,
         isAdmin,
         updateUser,
-        changePassword 
+        changePassword,
+        verifyEmail,
+        sendPasswordReset
     }
 
     return (

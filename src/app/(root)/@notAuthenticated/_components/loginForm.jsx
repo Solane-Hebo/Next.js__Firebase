@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/context/authContext"
 import { getErrorMessage } from "@/lib/getFirebaseError"
+import { usePasswordReset } from "@/context/password-reset-context"
 
    export const loginFormSchema = z.object({
     email: z.string()
@@ -29,6 +30,7 @@ export const LoginForm = ({changeForm, form}) => {
 
     const [errorMessage, setErrorMessage] = useState(null)
     const {loading, login } = useAuth()
+    const { setOpen } = usePasswordReset()
 
 
    async function onSubmit (values) {
@@ -39,12 +41,12 @@ export const LoginForm = ({changeForm, form}) => {
         setErrorMessage(errorMessage)
         
       }
-        console.log(values)
+
     }
   return (
     <>
     <h2 className="text-center font-semibold text-2xl mb-5">Logga in</h2>
-    {errorMessage && <p className="text-red text-center">{errorMessage}</p>}
+    {errorMessage && <p className="text-red-500 text-center">{errorMessage}</p>}
 
 
     <Form {...form}>
@@ -73,6 +75,7 @@ export const LoginForm = ({changeForm, form}) => {
                 <Input className="not-dark:bg-white" type="password" {...field} />
               </FormControl>
               <FormMessage />
+              <p>Glömt ditt lösenord ? <span onClick={() => setOpen(true)} className="underline cursor-pointer">Skicka återställningslänk</span></p>
             </FormItem>
           )}
         />

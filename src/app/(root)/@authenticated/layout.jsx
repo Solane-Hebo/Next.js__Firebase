@@ -1,9 +1,9 @@
-import {  NavLinks } from "@/components/navLinks"
+import {  Navbar} from "@/components/navbar"
 
 function AuthLayout({ children }) {
   return (
     <>
-    <NavLinks />
+    <Navbar />
       {children}
     </>
   )

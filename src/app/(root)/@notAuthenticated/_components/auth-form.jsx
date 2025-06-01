@@ -5,6 +5,8 @@ import { LoginForm, loginFormSchema } from "./loginForm"
 import { RegisterForm, registerFormSchema } from "./registerForm"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { PasswordResetProvider } from "@/context/password-reset-context"
+import { ResetPasswordDialog } from "./reset-password-dialog"
 
 export const AuthForm = () => {
 
@@ -38,11 +40,14 @@ export const AuthForm = () => {
 
   return (
     <div className="border max-w-2xl rounded-2xl mx-autop-5">
+        <PasswordResetProvider>
+          <ResetPasswordDialog />
         {
             showLogin
             ? <LoginForm changeForm={changeForm} form={loginForm} />
             : <RegisterForm changeForm={changeForm} form={registerForm} />
         }
+        </PasswordResetProvider>
     </div>
   )
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { AuthForm } from "../_components/auth-form"
+import { AuthForm } from "./_components/auth-form"
 
 function AuthPage() {
 

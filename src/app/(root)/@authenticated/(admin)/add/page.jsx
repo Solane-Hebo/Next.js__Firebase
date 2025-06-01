@@ -1,7 +1,11 @@
+import { AddTaskForm } from "./_components/add-task-form"
+
 
 function AddTaskPage() {
   return (
-    <div>AddTaskPage</div>
+    <div>
+      <AddTaskForm/>
+    </div>
   )
 }
 
